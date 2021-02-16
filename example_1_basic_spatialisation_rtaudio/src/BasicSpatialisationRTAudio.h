@@ -32,6 +32,8 @@
 #include <BinauralSpatializer/3DTI_BinauralSpatializer.h>
 #include <RtAudio.h>
 
+#include "AudioFile.h"
+using namespace Common;
 
 shared_ptr<RtAudio>						audio;												 // Pointer to RtAudio API
 
@@ -49,8 +51,37 @@ vector<float>							samplesVectorSpeech, samplesVectorSteps;			 // Storages the 
 unsigned int							wavSamplePositionSpeech, positionEndFrameSpeech,	 // Storages, respectively, the starting and ending position of the frame being rendered for each source
                                         wavSamplePositionSteps,  positionEndFrameSteps ;
 
+AudioFile<double>::AudioBuffer			bufferSave;
+class Moustique {
+public:
+    CVector3 position;
+    CVector3 destination;
+    vector<tuple<int, int, int>> path;
+    bool authorizeMovement;
+    bool waitForAuthorization;
+    bool askPosition;
+    bool ended;
+    float speed;
+    void init(int posX, int posY, int posZ, bool askPos, float speed);
+	void setSpeed(float newSpeed);
+    void stop();
+    void setDestination(int x, int y, int z);
+    void setPosition(int x, int y);
+    void setDestination(CVector3 vec);
+    void updatePosition();
+    float vectorLength(CVector3 vec);
+    CVector3 getDirection();
+    CVector3 normalize(CVector3 vec);
+    CVector3 Moustique::getPosition();
+    void setDefaultPath();
+    void getNextDestination();
 
-
+};
+void initialization(bool ask);
+void updatePosition(int x, int y);
+void end();
+string convertToString(char* a, int size);
+vector<string> split(const string& str, const string& delim);
 /** \brief This method gathers all audio processing (spatialization and reverberation)
 *	\param [out] bufferOutput output buffer processed
 *	\param [in] bufferSize size of buffer in samples
@@ -86,5 +117,9 @@ void LoadWav(std::vector<float>& samplesVector, const char* stringIn);
 *	\retval Integer value that equals 0 if we don't want the stream to stop
 */
 static int rtAudioCallback(void *outputBuffer, void *inputBuffer, unsigned int bufferSize, double streamTime, RtAudioStreamStatus status, void *data);
+void AudioLoader(std::vector<float>& samplesVector, const char* stringIn);
 
+void initAudio();
+void stopAudio();
+float getSpeedBiologicalMouvement(float pourcent);
 #endif
